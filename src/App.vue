@@ -1,5 +1,5 @@
 <template>
-  <div>我是app</div>
+  <router-view></router-view>
   <el-button>我是按钮</el-button>
 </template>
 
