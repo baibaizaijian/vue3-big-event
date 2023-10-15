@@ -10,6 +10,29 @@ import {
   CaretBottom
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
+import { useUserStore } from '@/stores'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+//获取用户信息
+const userStore = useUserStore()
+onMounted(() => {
+  userStore.getUser()
+})
+const onCommand = async (command) => {
+  if (command === 'logout') {
+    await ElMessageBox.confirm('你确认退出大事件吗？', '温馨提示', {
+      type: 'warning',
+      confirmButtonText: '确认',
+      cancelButtonText: '取消'
+    })
+    userStore.removeToken()
+    userStore.setUser({})
+    router.push(`/login`)
+  } else {
+    router.push(`/user/${command}`)
+  }
+}
 </script>
 
 <template>
@@ -17,7 +40,7 @@ import avatar from '@/assets/default.png'
     <el-aside width="200px">
       <div class="el-aside__logo"></div>
       <el-menu
-        active-text-color="#ffd04b"
+        active-text-color="#41b783"
         background-color="#232323"
         :default-active="$route.path"
         text-color="#fff"
@@ -53,10 +76,14 @@ import avatar from '@/assets/default.png'
     </el-aside>
     <el-container>
       <el-header>
-        <div>黑马程序员：<strong>小帅鹏</strong></div>
-        <el-dropdown placement="bottom-end">
+        <div>
+          黑马程序员：<strong>{{
+            userStore.user.nickname || userStore.user.username
+          }}</strong>
+        </div>
+        <el-dropdown placement="bottom-end" @command="onCommand">
           <span class="el-dropdown__box">
-            <el-avatar :src="avatar" />
+            <el-avatar :src="userStore.user.user_pic || avatar" />
             <el-icon><CaretBottom /></el-icon>
           </span>
           <template #dropdown>

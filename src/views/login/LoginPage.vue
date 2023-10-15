@@ -112,7 +112,7 @@ import { useUserStore } from '@/stores'
 import { useRouter } from 'vue-router'
 const userStore = useUserStore()
 const router = useRouter()
-const isRegister = ref(true)
+const isRegister = ref(false)
 const formModel = ref({
   username: '',
   password: '',

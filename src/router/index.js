@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores'
 
 //import.meta.env.BASE_URL vite环境变量
 
@@ -46,6 +47,18 @@ const router = createRouter({
       ]
     }
   ]
+})
+
+// 登录访问拦截
+//根据返回值决定,放行还拦截
+//1.true/undefined 直接放行
+//2.false 拦回 form 的地址
+//3.具体地址或者路径对象 ,拦截到对应地址
+//'/login' 或者{name:'login'}
+router.beforeEach((to, form) => {
+  const userStore = useUserStore()
+  if (!userStore.token && to.path !== '/login') return '/login'
+  if (userStore.token && to.path === '/login') return form
 })
 
 export default router
