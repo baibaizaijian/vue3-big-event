@@ -65,7 +65,7 @@
       style="margin-top: 20px; justify-content: flex-end"
     />
   </page-container>
-  <ArticleEdit ref="articleEditRef"></ArticleEdit>
+  <ArticleEdit ref="articleEditRef" @success="onSuccess"></ArticleEdit>
 </template>
 
 <script setup>
@@ -128,6 +128,16 @@ const onAddArticle = () => {
 
 const onEditArticle = (row) => {
   articleEditRef.value.open(row)
+}
+// 添加修改成功
+const onSuccess = (type) => {
+  if (type === 'add') {
+    // 如果是添加，需要跳转渲染最后一页，编辑直接渲染当前页
+    //total需要加1,因为total是本地值,服务器端已经+1了
+    const lastPage = Math.ceil((total.value + 1) / params.value.pagesize)
+    params.value.pagenum = lastPage
+  }
+  GetList()
 }
 </script>
 
