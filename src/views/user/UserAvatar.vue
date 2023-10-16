@@ -1,7 +1,95 @@
+<script setup>
+import { ref } from 'vue'
+import { Plus, Upload } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores'
+import { userUploadAvatarService } from '@/api/user.js'
+
+const userStore = useUserStore()
+
+const uploadRef = ref()
+const imgUrl = ref(userStore.user.user_pic)
+const onUploadFile = (file) => {
+  const reader = new FileReader()
+  reader.readAsDataURL(file.raw)
+  reader.onload = () => {
+    imgUrl.value = reader.result
+  }
+}
+const onUpdateAvatar = async () => {
+  await userUploadAvatarService(imgUrl.value)
+  await userStore.getUser()
+  ElMessage({ type: 'success', message: '更换头像成功' })
+}
+</script>
+
 <template>
-  <p>更换头像</p>
+  <page-container title="更换头像">
+    <el-row>
+      <el-col :span="12">
+        <!-- 关闭自动上传 -->
+        <el-upload
+          ref="uploadRef"
+          class="avatar-uploader"
+          :auto-upload="false"
+          :show-file-list="false"
+          :on-change="onUploadFile"
+        >
+          <img v-if="imgUrl" :src="imgUrl" class="avatar" />
+          <img v-else src="@/assets/avatar.jpg" width="278" />
+        </el-upload>
+        <br />
+        <!-- 
+          uploadRef 是一个对象，通常是一个 Vue 组件中的引用或引用一个 DOM 元素的对象
+          $el 是 Vue 组件实例的属性，它代表组件的根 DOM 元素。
+        querySelector('input') 是在组件的根 DOM 元素内查找第一个 <input> 元素的方法。
+        最后，.click() 被调用，它模拟了点击事件，通常用于触发 HTML 元素的点击操作。 -->
+        <el-button
+          type="primary"
+          :icon="Plus"
+          size="large"
+          @click="uploadRef.$el.querySelector('input').click()"
+        >
+          选择图片
+        </el-button>
+        <el-button
+          type="success"
+          :icon="Upload"
+          size="large"
+          @click="onUpdateAvatar"
+        >
+          上传头像
+        </el-button>
+      </el-col>
+    </el-row>
+  </page-container>
 </template>
 
-<script setup></script>
-
-<style></style>
+<style lang="scss" scoped>
+.avatar-uploader {
+  :deep() {
+    .avatar {
+      width: 278px;
+      height: 278px;
+      display: block;
+    }
+    .el-upload {
+      border: 1px dashed var(--el-border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: var(--el-transition-duration-fast);
+    }
+    .el-upload:hover {
+      border-color: var(--el-color-primary);
+    }
+    .el-icon.avatar-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 278px;
+      height: 278px;
+      text-align: center;
+    }
+  }
+}
+</style>
